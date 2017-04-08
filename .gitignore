@@ -7,3 +7,7 @@ words.txt
 
 # PyCharm
 .idea
+
+# Old code
+run_model.py
+internal_model.py
