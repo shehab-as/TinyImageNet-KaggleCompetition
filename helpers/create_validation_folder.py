@@ -1,5 +1,4 @@
 import os
-
         # Script that automates the process of creating a validation dataset from train data #
         # Hardcoded to create 20% of train data --> 20,000 images total in validation folder #
 
