@@ -11,3 +11,4 @@ words.txt
 # Old code
 run_model.py
 internal_model.py
+create_validation_folder.py

@@ -12,9 +12,12 @@ now = time.strftime("%c")
 nb_of_classes = 200
 img_height = 299
 img_width = 299
-batch_size = 64
+batch_size = 128
+nb_of_epochs = 800
+nb_train_samples = 80000
+nb_validation_samples = 2000
 train_dir_path = 'data/train'
-nb_of_epochs = 500
+# validate_dir_path = 'data/'
 test_dir_path = 'test_images'  # test path not used yet...
 
 #   Fixed Seed and callbacks...
@@ -68,16 +71,17 @@ validate_data_generator = ImageDataGenerator(
 #   Loading Dataset TinyImageNet
 train_data_generator = train_data_generator.flow_from_directory(train_dir_path, target_size=(img_width, img_height),
                                                                 batch_size=batch_size,
-                                                                shuffle=True,
-                                                                class_mode='binary')
-# validate_data_generator = validate_data_generator.flow_from_directory(..., target_size=(img_width, img_height),
-#                                                                       batch_size=batch_size,
-#                                                                       shuffle=False,
-#                                                                       class_mode='binary')
+                                                                shuffle=True)
 
+# TODO: Validation data should be 20% of the train data
+validate_data_generator = validate_data_generator.flow_from_directory(train_dir_path, target_size=(img_width, img_height),
+                                                                      batch_size=batch_size,
+                                                                      shuffle=False)
 print("Dataset loaded!")
 print("Now Training...")
 model.fit_generator(train_data_generator,
+                    steps_per_epoch= nb_train_samples // batch_size,
                     epochs=nb_of_epochs,
                     validation_data=validate_data_generator,
+                    validation_steps= nb_validation_samples // batch_size,
                     verbose=1, callbacks=callbacks)
