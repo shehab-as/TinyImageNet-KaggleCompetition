@@ -20,6 +20,14 @@ train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
 test_dir_path = 'test_images/'  # test path not used yet...
 
+class CustomImageDataGen(ImageDataGenerator):
+    def standardize(self, x):
+        if self.featurewise_center:
+            x /= 255.
+            x -= 0.5
+            x *= 2.
+        return x
+
 #   Fixed Seed and callbacks...
 np.random.seed(seed=204)
 tensorboard_callback = TensorBoard(log_dir="./logs/training_" + now, histogram_freq=0, write_graph=True,
@@ -50,7 +58,7 @@ model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accurac
 
 #   Loading Data...
 #   Data Generation...
-train_data_generator = ImageDataGenerator(
+train_data_generator = CustomImageDataGen(
     featurewise_center=True,  # set input mean to 0 over the dataset
     samplewise_center=False,  # don't set each sample mean to 0
     featurewise_std_normalization=True,  # divide all inputs by std of the dataset
@@ -63,7 +71,7 @@ train_data_generator = ImageDataGenerator(
     width_shift_range=0.1,
     height_shift_range=0.1
 )
-validate_data_generator = ImageDataGenerator(
+validate_data_generator = CustomImageDataGen(
     featurewise_center=True,  # test images should have input mean set to 0 over the images.
     featurewise_std_normalization=True,  # test images should have all divided by std of the images.
     zca_whitening=False
