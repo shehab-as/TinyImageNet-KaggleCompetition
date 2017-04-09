@@ -46,7 +46,7 @@ predictions = Dense(nb_of_classes, activation='softmax')(x)
 model = Model(inputs=[pre_trained_model.input], outputs=[predictions])      # Keras 2.0 API
 # model = Model(input=pre_trained_model.input, output=predictions)          # Keras 1.0 API
 adam = Adam(lr=0.0001)
-model.compile(optimizer=adam, loss='categorical_crossentropy')
+model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
 
 #   Loading Data...
 #   Data Generation...
