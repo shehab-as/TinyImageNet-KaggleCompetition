@@ -18,7 +18,7 @@ nb_train_samples = 80000
 nb_validation_samples = 20000
 train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
-test_dir_path = 'test_images'  # test path not used yet...
+test_dir_path = 'test_images/'  # test path not used yet...
 
 #   Fixed Seed and callbacks...
 np.random.seed(seed=204)
@@ -85,6 +85,3 @@ model.fit_generator(train_data_generator,
                     validation_data=validate_data_generator,
                     validation_steps= nb_validation_samples // batch_size,
                     verbose=1, callbacks=callbacks)
-
-# TODO: Once done training, evaluate by loading saved top_acc_weights...
-# TODO: Write to a file in the kaggle submission format!
