@@ -17,7 +17,7 @@ nb_of_epochs = 800
 nb_train_samples = 80000
 nb_validation_samples = 20000
 train_dir_path = 'data/train'
-# validate_dir_path = 'data/'
+validate_dir_path = 'data/validation'
 test_dir_path = 'test_images'  # test path not used yet...
 
 #   Fixed Seed and callbacks...
@@ -43,7 +43,8 @@ x = Dense(1024, activation='relu')(x)
 predictions = Dense(nb_of_classes, activation='softmax')(x)
 
 #   Building Model...
-model = Model(input=pre_trained_model.input, output=predictions)
+model = Model(inputs=[pre_trained_model.input], outputs=[predictions])      # Keras 2.0 API
+# model = Model(input=pre_trained_model.input, output=predictions)          # Keras 1.0 API
 adam = Adam(lr=0.0001)
 model.compile(optimizer=adam, loss='categorical_crossentropy')
 
@@ -73,8 +74,7 @@ train_data_generator = train_data_generator.flow_from_directory(train_dir_path, 
                                                                 batch_size=batch_size,
                                                                 shuffle=True)
 
-# TODO: Validation data should be 20% of the train data
-validate_data_generator = validate_data_generator.flow_from_directory(train_dir_path, target_size=(img_width, img_height),
+validate_data_generator = validate_data_generator.flow_from_directory(validate_dir_path, target_size=(img_width, img_height),
                                                                       batch_size=batch_size,
                                                                       shuffle=False)
 print("Dataset loaded!")
@@ -85,3 +85,6 @@ model.fit_generator(train_data_generator,
                     validation_data=validate_data_generator,
                     validation_steps= nb_validation_samples // batch_size,
                     verbose=1, callbacks=callbacks)
+
+# TODO: Once done training, evaluate by loading saved top_acc_weights...
+# TODO: Write to a file in the kaggle submission format!

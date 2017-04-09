@@ -1,6 +1,6 @@
 # Dataset
-test_images
 data
+test_images
 
 # words
 words.txt
@@ -9,6 +9,5 @@ words.txt
 .idea
 
 # Old code
-run_model.py
-internal_model.py
-create_validation_folder.py
+helpers/run_model.py
+helpers/internal_model.py
