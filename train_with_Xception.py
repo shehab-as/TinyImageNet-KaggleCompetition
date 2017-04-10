@@ -6,6 +6,8 @@ from keras.models import Model
 from keras.layers import Input, Dense, GlobalAveragePooling2D
 from keras.optimizers import Adam
 from keras.callbacks import TensorBoard, ModelCheckpoint
+from keras.preprocessing import image
+from keras.applications.xception import preprocess_input, decode_predictions
 import time
 
 now = time.strftime("%c")
@@ -93,3 +95,28 @@ model.fit_generator(train_data_generator,
                     validation_data=validate_data_generator,
                     validation_steps= nb_validation_samples // batch_size,
                     verbose=1, callbacks=callbacks)
+
+
+#~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
+# TODO: Map the indices with labels...
+final_predictions = [0] * 10000
+def create_submission_file():
+    with open('my_submission.txt', 'w') as file:
+        file.write('Id,Prediction\n')
+        for i in range(10000):
+            file.write('test_%d.JPEG,%s\n' % (i, final_predictions[i]))
+        file.close()
+
+for i in range(10000):
+    img_path = 'test_%d.JPEG' % i
+    img = image.load_img(test_dir_path + img_path, target_size=(img_width, img_height))
+    x = image.img_to_array(img)
+    x = np.expand_dims(x, axis=0)
+    x = preprocess_input(x)
+    preds = model.predict(x)
+    final_predictions[i] = preds.argmax()
+
+    # print('Predicted:', decode_predictions(preds, top=3)[0])
+    # Predicted: [(u'n02504013', u'Indian_elephant', 0.82658225), (u'n01871265', u'tusker', 0.1122357), (u'n02504458', u'African_elephant', 0.061040461)]
+
+create_submission_file()
