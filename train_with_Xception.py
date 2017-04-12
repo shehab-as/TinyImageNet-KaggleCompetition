@@ -40,6 +40,7 @@ callbacks = [tensorboard_callback, checkpoint_callback]
 input_tensor = Input(shape=(img_width, img_height, 3))
 
 #   Using Xception pre-trained Network...
+# TODO: Use Inception V3 too.
 pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False)
 x = pre_trained_model.output
 x = GlobalAveragePooling2D()(x)
@@ -100,8 +101,9 @@ model.fit_generator(train_data_generator,
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~#
 # TODO: Map the indices with labels...
 final_predictions = [0] * 10000
+submission_number = 1
 def create_submission_file():
-    with open('my_submission.txt', 'w') as file:
+    with open('my_submission%d.txt' %submission_number, 'w') as file:
         file.write('Id,Prediction\n')
         for i in range(10000):
             file.write('test_%d.JPEG,%s\n' % (i, final_predictions[i]))

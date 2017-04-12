@@ -13,7 +13,7 @@ def parse_wnids(filename='wnids.txt'):
         for i, line in enumerate(input_file, 1):
             list_of_wnids[i] = line.strip('\n')
             # print(" {} - {} ".format(i, list_of_wnids[i]))
-    print("Done.")
+    print("Done parsing.")
 
 def create_validation_folder():
     print("Creating Validation folder...")
@@ -28,7 +28,7 @@ def create_validation_folder():
             cmd = 'mv %s%s%s_%d.JPEG %s%s' % (path_to_train_folder, class_folder, class_folder, img,
                                               path_to_validation_folder, class_folder)
             os.system(cmd)
-    print("Done.")
+    print("Done creating validation data.")
 
 
 if __name__ == '__main__':
