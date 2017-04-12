@@ -15,25 +15,23 @@ test_dir_path = 'test_images/'  # test path not used yet...
 input_tensor = Input(shape=(img_width, img_height, 3))
 final_predictions = [0] * 10000
 
-# TODO: Map the indices with labels...
+submission_number = 1
 def create_submission_file():
-    with open('my_submission.txt', 'w') as file:
+    with open('my_submission%d.txt' %submission_number, 'w') as file:
         file.write('Id,Prediction\n')
         for i in range(10000):
             file.write('test_%d.JPEG,%s\n' % (i, final_predictions[i]))
         file.close()
 
 #   Using Xception pre-trained Network...
-pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False)
+pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 x = pre_trained_model.output
-x = GlobalAveragePooling2D()(x)
 
 #   freeze CNN layers...
 for layer in pre_trained_model.layers:
     layer.trainable = False
 
 #   Adding Fully Connected Layer on top of it...
-x = Dense(1024, activation='relu')(x)
 predictions = Dense(nb_of_classes, activation='softmax')(x)
 
 #   Actual Model
@@ -42,9 +40,11 @@ adam = Adam(lr=0.0001)
 
 #   Loading Weights...
 print("Loading Best Accuracy Weights...")
-model.load_weights("./top_acc_weights.hdf5.hdf5")
+# TODO: Load different weights and have different predictions...
+model.load_weights("./")
 model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy', 'top_k_categorical_accuracy'])
 
+# Classifying test_images
 for i in range(10000):
     img_path = 'test_%d.JPEG' % i
     img = image.load_img(test_dir_path + img_path, target_size=(img_width, img_height))
@@ -54,7 +54,5 @@ for i in range(10000):
     preds = model.predict(x)
     final_predictions[i] = preds.argmax()
 
-    # print('Predicted:', decode_predictions(preds, top=3)[0])
-    # Predicted: [(u'n02504013', u'Indian_elephant', 0.82658225), (u'n01871265', u'tusker', 0.1122357), (u'n02504458', u'African_elephant', 0.061040461)]
-
+# write to a submission file
 create_submission_file()

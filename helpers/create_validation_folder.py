@@ -6,6 +6,8 @@ path_to_validation_folder = '/Users/shehabmohamed/PycharmProjects/TinyImageNet-K
 path_to_train_folder = '/Users/shehabmohamed/PycharmProjects/TinyImageNet-KaggleCompetition/data/train'
 nb_of_classes = 201 # + offset 1
 list_of_wnids = [0] * nb_of_classes
+percentage = 0.2
+validation_size = (percentage * 100000) / (nb_of_classes - 1)
 
 def parse_wnids(filename='wnids.txt'):
     print("Getting all class IDs...")
@@ -23,7 +25,7 @@ def create_validation_folder():
         print("%d - making val folder for class %s" %(class_indx, class_folder))
         cmd = 'mkdir ' + path_to_validation_folder + class_folder
         os.system(cmd)
-        for img in range (100):     # 100/500 imgs per class (20%)
+        for img in range (validation_size):     # 100/500 imgs per class (20%)
             # /Users/shehabmohamed/PycharmProjects/TinyImageNet-KaggleCompetition/data/train/n01443537/n01443537_0.JPEG
             cmd = 'mv %s%s%s_%d.JPEG %s%s' % (path_to_train_folder, class_folder, class_folder, img,
                                               path_to_validation_folder, class_folder)
