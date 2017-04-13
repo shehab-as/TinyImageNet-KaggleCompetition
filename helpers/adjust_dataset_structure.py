@@ -25,7 +25,7 @@ def restructure_train_data():
             os.system(cmd)
         print("~~~~~~ %d - Moved all images from class %s" %(class_indx, class_folder))
         # delete empty images folder and boxes...
-        os.system('rm -rf ' + new_path_to_class_folder)
+        os.system('rm -rf ' + old_path_to_class_folder)
         os.system('rm -rf ' + new_path_to_class_folder + class_folder + '_boxes.txt')
     print("Done Moving data from train/class/images to train/class.")
 
