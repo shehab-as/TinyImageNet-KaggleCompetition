@@ -7,7 +7,7 @@ def parse_wnids(filename='wnids.txt'):
         for i, line in enumerate(input_file, 1):
             list_of_wnids[i] = str(line.strip('\n'))
             # print(" {} - {} ".format(i, list_of_wnids[i]))
-    del list_of_wnids[0]
+    del list_of_wnids[0]    # Removing empty first element.
     print("Done parsing.")
 
 def sort_wnids():
@@ -16,7 +16,6 @@ def sort_wnids():
         for i, line in enumerate(list_of_wnids, 1):
             write_file.write(str(line) + '\n')
     print("Done writing.")
-
 
 if __name__ == '__main__':
     parse_wnids()
