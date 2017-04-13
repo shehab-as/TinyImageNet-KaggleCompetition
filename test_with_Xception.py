@@ -41,7 +41,13 @@ adam = Adam(lr=0.0001)
 #   Loading Weights...
 print("Loading Best Accuracy Weights...")
 # TODO: Load different weights and have different predictions...
-model.load_weights("./")
+model.load_weights("./top_acc_weights.hdf5")            # 65% (FC) 1024
+#model.load_weights("./top_acc_weights_finetune.hdf5")   # 75% (FC) 1024
+#model.load_weights("./top_acc_weights_finetune2.hdf5")  # 80% (FC)1024
+#model.load_weights("./top_acc_weights_no_FC.hdf5")      # 80%
+#model.load_weights("./top_acc_weights_no_FC2.hdf5")     # 80%
+#model.load_weights("./top_acc_weights_no_FC3.hdf5")     # ??
+
 model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy', 'top_k_categorical_accuracy'])
 
 # Classifying test_images
