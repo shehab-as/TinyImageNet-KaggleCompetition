@@ -1,11 +1,12 @@
 import os
         # Script that automates the process of creating a validation dataset from train data #
-        # Hardcoded to create 20% of train data --> 20,000 images total in validation folder #
 
+# Change the path according to the location of the folder...
 path_to_validation_folder = '/Users/shehabmohamed/PycharmProjects/TinyImageNet-KaggleCompetition/data/validation'
 path_to_train_folder = '/Users/shehabmohamed/PycharmProjects/TinyImageNet-KaggleCompetition/data/train'
 nb_of_classes = 201 # + offset 1
 list_of_wnids = [0] * nb_of_classes
+# Percentage of the validation you need from dataset. Default is 20% -> 20,000 imgs
 percentage = 0.2
 validation_size = (percentage * 100000) / (nb_of_classes - 1)
 

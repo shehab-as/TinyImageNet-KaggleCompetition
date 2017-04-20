@@ -1,13 +1,10 @@
 import numpy as np
-from keras.preprocessing import image as image_utils
 from keras.preprocessing.image import ImageDataGenerator
 from keras.applications import Xception
 from keras.models import Model
 from keras.layers import Input, Dense, GlobalAveragePooling2D
-from keras.optimizers import Adam
-from keras.callbacks import TensorBoard, ModelCheckpoint
-from keras.preprocessing import image
-from keras.applications.xception import preprocess_input, decode_predictions
+from keras.optimizers import Adam, SGD
+from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 import time
 
 now = time.strftime("%c")
@@ -15,12 +12,13 @@ nb_of_classes = 200
 img_height = 299
 img_width = 299
 batch_size = 64
-nb_of_epochs = 800
+nb_of_epochs = 100
 nb_train_samples = 80000
 nb_validation_samples = 20000
 train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
 test_dir_path = 'test_images/'  # test path not used yet...
+
 
 class CustomImageDataGen(ImageDataGenerator):
     def standardize(self, x):
@@ -30,34 +28,38 @@ class CustomImageDataGen(ImageDataGenerator):
             x *= 2.
         return x
 
-#   Fixed Seed and callbacks...
+
+# Fixed Seed and callbacks...
 np.random.seed(seed=204)
 tensorboard_callback = TensorBoard(log_dir="./logs/training_" + now, histogram_freq=0, write_graph=True,
                                    write_images=False)
 checkpoint_callback = ModelCheckpoint(filepath="./top_acc_weights.hdf5", verbose=1, save_best_only=True,
                                       monitor="val_acc")
-callbacks = [tensorboard_callback, checkpoint_callback]
+reduce_on_plateau = ReduceLROnPlateau(monitor='val_loss', factor=0.7, patience=10, verbose=0, mode='auto',
+                                      epsilon=0.0001, cooldown=0, min_lr=0)
+
+callbacks = [tensorboard_callback, checkpoint_callback, reduce_on_plateau]
 input_tensor = Input(shape=(img_width, img_height, 3))
 
 #   Using Xception pre-trained Network...
-# TODO: Use Inception V3 too.
-pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False)
+pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 x = pre_trained_model.output
-x = GlobalAveragePooling2D()(x)
 
 #   freeze CNN layers...
 for layer in pre_trained_model.layers:
     layer.trainable = False
 
-#   Adding Fully Connected Layer on top of it...
-x = Dense(1024, activation='relu')(x)
+# Adding Fully Connected Layer on top of it...
+# x = Dense(1024, activation='relu')(x)
 predictions = Dense(nb_of_classes, activation='softmax')(x)
 
 #   Building Model...
-model = Model(inputs=[pre_trained_model.input], outputs=[predictions])      # Keras 2.0 API
+model = Model(inputs=[pre_trained_model.input], outputs=[predictions])  # Keras 2.0 API
 # model = Model(input=pre_trained_model.input, output=predictions)          # Keras 1.0 API
-adam = Adam(lr=0.0001)
-model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
+
+adam = Adam(lr=0.0001)  # not really good optimizer...
+sgd = SGD(lr=0.01, momentum=0.9)
+model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
 
 #   Loading Data...
 #   Data Generation...
@@ -85,14 +87,15 @@ train_data_generator = train_data_generator.flow_from_directory(train_dir_path, 
                                                                 batch_size=batch_size,
                                                                 shuffle=True)
 
-validate_data_generator = validate_data_generator.flow_from_directory(validate_dir_path, target_size=(img_width, img_height),
+validate_data_generator = validate_data_generator.flow_from_directory(validate_dir_path,
+                                                                      target_size=(img_width, img_height),
                                                                       batch_size=batch_size,
                                                                       shuffle=False)
 print("Dataset loaded!")
 print("Now Training...")
 model.fit_generator(train_data_generator,
-                    steps_per_epoch= nb_train_samples // batch_size,
+                    steps_per_epoch=nb_train_samples // batch_size,
                     epochs=nb_of_epochs,
                     validation_data=validate_data_generator,
-                    validation_steps= nb_validation_samples // batch_size,
+                    validation_steps=nb_validation_samples // batch_size,
                     verbose=1, callbacks=callbacks)
