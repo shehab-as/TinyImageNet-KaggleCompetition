@@ -6,7 +6,8 @@ path_to_train_folder = '/Users/shehabmohamed/Downloads/train'
 nb_of_classes = 201 # + offset 1
 list_of_wnids = [0] * nb_of_classes
 
-def parse_wnids(filename='wnids.txt'):
+
+def parse_wnids(filename='wnids_unsorted.txt'):
     print("Getting all class IDs...")
     with open(filename, mode='r') as input_file:
         for i, line in enumerate(input_file, 1):

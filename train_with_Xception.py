@@ -1,9 +1,9 @@
 import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
-from keras.applications import Xception
+from keras.applications import InceptionV3, Xception
 from keras.models import Model
-from keras.layers import Input, Dense, GlobalAveragePooling2D
-from keras.optimizers import Adam, SGD
+from keras.layers import Input, Dense
+from keras.optimizers import Adam, RMSprop, SGD
 from keras.callbacks import TensorBoard, ModelCheckpoint, ReduceLROnPlateau
 import time
 
@@ -11,23 +11,21 @@ now = time.strftime("%c")
 nb_of_classes = 200
 img_height = 299
 img_width = 299
-batch_size = 64
+batch_size = 32
 nb_of_epochs = 100
-nb_train_samples = 80000
-nb_validation_samples = 20000
+nb_train_samples = 85000
+nb_validation_samples = 25000
 train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
-test_dir_path = 'test_images/'  # test path not used yet...
 
 
-class CustomImageDataGen(ImageDataGenerator):
+class CustomImageDataGen(ImageDataGenerator):  # Overloading the ImageDataGenerator
     def standardize(self, x):
         if self.featurewise_center:
             x /= 255.
             x -= 0.5
             x *= 2.
         return x
-
 
 # Fixed Seed and callbacks...
 np.random.seed(seed=204)
@@ -36,7 +34,7 @@ tensorboard_callback = TensorBoard(log_dir="./logs/training_" + now, histogram_f
 checkpoint_callback = ModelCheckpoint(filepath="./top_acc_weights.hdf5", verbose=1, save_best_only=True,
                                       monitor="val_acc")
 reduce_on_plateau = ReduceLROnPlateau(monitor='val_loss', factor=0.7, patience=10, verbose=0, mode='auto',
-                                      epsilon=0.0001, cooldown=0, min_lr=0)
+                                      epsilon=0.0001, cooldown=0, min_lr=0.000001)
 
 callbacks = [tensorboard_callback, checkpoint_callback, reduce_on_plateau]
 input_tensor = Input(shape=(img_width, img_height, 3))
@@ -46,11 +44,9 @@ pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, incl
 x = pre_trained_model.output
 
 #   freeze CNN layers...
-for layer in pre_trained_model.layers:
+for layer in pre_trained_model.layers[:20]:
     layer.trainable = False
 
-# Adding Fully Connected Layer on top of it...
-# x = Dense(1024, activation='relu')(x)
 predictions = Dense(nb_of_classes, activation='softmax')(x)
 
 #   Building Model...
@@ -58,7 +54,7 @@ model = Model(inputs=[pre_trained_model.input], outputs=[predictions])  # Keras 
 # model = Model(input=pre_trained_model.input, output=predictions)          # Keras 1.0 API
 
 adam = Adam(lr=0.0001)  # not really good optimizer...
-sgd = SGD(lr=0.01, momentum=0.9)
+sgd = SGD(lr=0.0001, momentum=0.9)
 model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
 
 #   Loading Data...
@@ -82,11 +78,11 @@ validate_data_generator = CustomImageDataGen(
     zca_whitening=False
 )
 
-#   Loading Dataset TinyImageNet
+#   Loading Train Data...
 train_data_generator = train_data_generator.flow_from_directory(train_dir_path, target_size=(img_width, img_height),
                                                                 batch_size=batch_size,
                                                                 shuffle=True)
-
+#   Loading Validation Data...
 validate_data_generator = validate_data_generator.flow_from_directory(validate_dir_path,
                                                                       target_size=(img_width, img_height),
                                                                       batch_size=batch_size,
