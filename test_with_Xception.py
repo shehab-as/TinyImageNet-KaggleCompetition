@@ -48,7 +48,7 @@ predictions = Dense(nb_of_classes, activation='softmax')(x)
 #   Actual Model
 model = Model(inputs=[pre_trained_model.input], outputs=[predictions])      # Keras 2.0 API
 adam = Adam(lr=0.0001)
-sgd = SGD(lr=0.00001, momentum=0.9)
+sgd = SGD(lr=0.00001, momentum=0.8)
 
 #   Loading Top Accuracy Weights and Compiling Model...
 print("Loading Top Accuracy Weights...")

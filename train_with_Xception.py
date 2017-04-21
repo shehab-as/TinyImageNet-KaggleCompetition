@@ -13,8 +13,8 @@ img_height = 299
 img_width = 299
 batch_size = 32
 nb_of_epochs = 100
-nb_train_samples = 85000
-nb_validation_samples = 25000
+nb_train_samples = 90000
+nb_validation_samples = 10000
 train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
 
@@ -40,6 +40,7 @@ callbacks = [tensorboard_callback, checkpoint_callback, reduce_on_plateau]
 input_tensor = Input(shape=(img_width, img_height, 3))
 
 #   Using Xception pre-trained Network...
+# pre_trained_model = InceptionV3(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 x = pre_trained_model.output
 
@@ -54,7 +55,9 @@ model = Model(inputs=[pre_trained_model.input], outputs=[predictions])  # Keras 
 # model = Model(input=pre_trained_model.input, output=predictions)          # Keras 1.0 API
 
 adam = Adam(lr=0.0001)  # not really good optimizer...
-sgd = SGD(lr=0.0001, momentum=0.9)
+# Phase 1 for SGD (High Learning Rate) lr= 0.01
+# Phase 2 for SGD (Slow Learning Rate) lr= 0.00001
+sgd = SGD(lr=0.00001, momentum=0.9)
 model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
 
 #   Loading Data...
