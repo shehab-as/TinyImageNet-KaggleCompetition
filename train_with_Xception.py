@@ -19,7 +19,8 @@ train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
 
 
-class CustomImageDataGen(ImageDataGenerator):  # Overloading the ImageDataGenerator
+class CustomImageDataGen(
+    ImageDataGenerator):  # Overloading the ImageDataGenerator and manually standardize each input image (x)
     def standardize(self, x):
         if self.featurewise_center:
             x /= 255.
@@ -44,7 +45,7 @@ input_tensor = Input(shape=(img_width, img_height, 3))
 pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 x = pre_trained_model.output
 
-#   freeze CNN layers...
+#   freeze first 20 layers...
 for layer in pre_trained_model.layers[:20]:
     layer.trainable = False
 
@@ -60,7 +61,6 @@ adam = Adam(lr=0.0001)  # not really good optimizer...
 sgd = SGD(lr=0.00001, momentum=0.9)
 model.compile(optimizer=sgd, loss='categorical_crossentropy', metrics=['accuracy'])
 
-#   Loading Data...
 #   Data Generation...
 train_data_generator = CustomImageDataGen(
     featurewise_center=True,  # set input mean to 0 over the dataset

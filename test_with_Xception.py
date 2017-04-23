@@ -39,10 +39,6 @@ def create_submission_file():
 pre_trained_model = Xception(weights='imagenet', input_tensor=input_tensor, include_top=False, pooling='avg')
 x = pre_trained_model.output
 
-#   freeze CNN layers...
-for layer in pre_trained_model.layers[:20]:
-    layer.trainable = False
-
 predictions = Dense(nb_of_classes, activation='softmax')(x)
 
 #   Actual Model
