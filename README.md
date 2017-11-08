@@ -16,3 +16,7 @@ data/
       class1/
       class2/
 ```
+
+### Install dependencies before running the program
+
+pip3 install -r requirements.txt (Python 3.5.2)
