@@ -19,8 +19,9 @@ train_dir_path = 'data/train'
 validate_dir_path = 'data/validation'
 
 
+# Preprocess image to fit in Xception Model.
 class CustomImageDataGen(
-    ImageDataGenerator):  # Overloading the ImageDataGenerator and manually standardize each input image (x)
+    ImageDataGenerator):  # Inheriting class ImageDataGenerator and manually standardize each input image (x)
     def standardize(self, x):
         if self.featurewise_center:
             x /= 255.
